@@ -40,7 +40,7 @@ connection.query("SELECT * FROM role;", (err, data) => {
         return res.status(500).end();
     }
     data.forEach(element => {
-        roles.push(element.name)
+        roles.push(element.title)
     });
 });
 
@@ -180,12 +180,12 @@ function addEmployee() {
         .prompt([
 
             {
-                message: "What is the name of the new Role?",
+                message: "What is the employees first name?",
 
                 name: "first_name"
             },
             {
-                message: "What is the Salary of the new Role?",
+                message: "What is the employees last name?",
 
                 name: "last_name"
             },
@@ -206,10 +206,10 @@ function addEmployee() {
         ]).then(answers => {
             let role_id = JSON.parse(roles.indexOf(answers.role)) + 1
             console.log(role_id);
-            connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answers.title, answers.salary, role_id, answers.managerId],
+            connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answers.first_name, answers.last_name, role_id, JSON.parse(answers.managerId)],
                 (err, data) => {
                     if (err) {
-                        return res.status(500).end();
+                        // return res.status(500).end();
                     }
 
                     init();
