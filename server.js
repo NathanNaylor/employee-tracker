@@ -54,7 +54,7 @@ function init() {
             console.log(answers)
             switch (answers.prompt) {
                 case "View All Employees":
-                    viewAllEmployees();
+                    viewAll("employee");
                     break;
                 case "Add Employee":
                     addEmployee();
@@ -63,13 +63,13 @@ function init() {
                     updateEmployeeRole();
                     break;
                 case "View All Roles":
-                    viewAllRoles();
+                    viewAll("role");
                     break;
                 case "Add Role":
                     addRole();
                     break;
                 case "View All Departments":
-                    viewAllDepartments();
+                    viewAll("department");
                     break;
                 case "Add Department":
                     addDepartment();
@@ -82,8 +82,8 @@ function init() {
 }
 
 
-function viewAllEmployees() {
-    connection.query("SELECT * FROM employee;", (err, data) => {
+function viewAll(tableName) {
+    connection.query("SELECT * FROM ??;", tableName, (err, data) => {
         if (err) {
             return res.status(500).end();
         }
@@ -92,27 +92,3 @@ function viewAllEmployees() {
         init();
     });
 };
-
-
-function viewAllDepartments() {
-    connection.query("SELECT * FROM department;", (err, data) => {
-        if (err) {
-            return res.status(500).end();
-        }
-
-        console.table(data);
-        init();
-    });
-}
-
-
-function viewAllRoles() {
-    connection.query("SELECT * FROM role;", (err, data) => {
-        if (err) {
-            return res.status(500).end();
-        }
-
-        console.table(data);
-        init();
-    });
-}
