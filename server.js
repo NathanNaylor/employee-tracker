@@ -25,6 +25,7 @@ connection.connect((err) => {
 
 const departments = []
 const roles = []
+const employees = []
 
 connection.query("SELECT * FROM department;", (err, data) => {
     if (err) {
@@ -41,6 +42,15 @@ connection.query("SELECT * FROM role;", (err, data) => {
     }
     data.forEach(element => {
         roles.push(element.title)
+    });
+});
+
+connection.query("SELECT * FROM employee;", (err, data) => {
+    if (err) {
+        return res.status(500).end();
+    }
+    data.forEach(element => {
+        employees.push(element.first_name + " " + element.last_name)
     });
 });
 
@@ -180,7 +190,7 @@ function addEmployee() {
         .prompt([
 
             {
-                message: "What is the employees first name?",
+                message: "Which employee do you want to change?",
 
                 name: "first_name"
             },
@@ -216,3 +226,41 @@ function addEmployee() {
                 });
         })
 };
+
+function updateEmployeeRole() {
+    inquirer
+        .prompt([{
+                type: "list",
+
+                message: "Which employees role would you like to edit?",
+
+                choices: employees,
+
+                name: "employee"
+            },
+            {
+                type: "list",
+
+                message: "What would you like to set their role to?",
+
+                choices: roles,
+
+                name: "role"
+
+            }
+
+        ]).then(answers => {
+            let role_id = JSON.parse(roles.indexOf(answers.role)) + 1
+            console.log(role_id);
+            let employee_id = JSON.parse(employees.indexOf(answers.employee)) + 1
+            console.log(employee_id);
+            connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [role_id, employee_id],
+                (err, data) => {
+                    if (err) {
+                        // return res.status(500).end();
+                    }
+
+                    init();
+                });
+        })
+}
