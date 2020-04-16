@@ -7,7 +7,6 @@ require("console.table");
 // process.env.PORT lets the port be set by Heroku
 const PORT = process.env.PORT || 8080;
 
-
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -23,6 +22,28 @@ connection.connect((err) => {
     }
     console.table("connected as id " + connection.threadId);
 });
+
+const departments = []
+const roles = []
+
+connection.query("SELECT * FROM department;", (err, data) => {
+    if (err) {
+        return res.status(500).end();
+    }
+    data.forEach(element => {
+        departments.push(element.name)
+    });
+});
+
+connection.query("SELECT * FROM role;", (err, data) => {
+    if (err) {
+        return res.status(500).end();
+    }
+    data.forEach(element => {
+        roles.push(element.name)
+    });
+});
+
 
 init();
 
@@ -91,4 +112,107 @@ function viewAll(tableName) {
         console.table(data);
         init();
     });
+};
+
+function addRole() {
+    inquirer
+        .prompt([
+
+            {
+                message: "What is the name of the new Role?",
+
+                name: "title"
+            },
+            {
+                message: "What is the Salary of the new Role?",
+
+                name: "salary"
+            },
+            {
+                type: "list",
+
+                message: "What Department?",
+
+                choices: departments,
+
+                name: "department"
+            }
+        ]).then(answers => {
+            let department_id = JSON.parse(departments.indexOf(answers.department)) + 1
+            console.log(department_id);
+            connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [answers.title, answers.salary, department_id],
+                (err, data) => {
+                    if (err) {
+                        return res.status(500).end();
+                    }
+
+                    init();
+                });
+        })
+
+};
+
+function addDepartment() {
+    inquirer
+        .prompt([
+
+            {
+                message: "What is the name of the new Department?",
+
+                name: "name"
+            }
+        ]).then(answers => {
+            departments.push(answers.name)
+            connection.query("INSERT INTO department (name) VALUES (?)",
+                answers.name,
+                (err, data) => {
+                    if (err) {
+                        return res.status(500).end();
+                    }
+                    init();
+                });
+        })
+
+};
+
+function addEmployee() {
+    inquirer
+        .prompt([
+
+            {
+                message: "What is the name of the new Role?",
+
+                name: "first_name"
+            },
+            {
+                message: "What is the Salary of the new Role?",
+
+                name: "last_name"
+            },
+            {
+                type: "list",
+
+                message: "What Role?",
+
+                choices: roles,
+
+                name: "role"
+            },
+            {
+                message: "What is their managers ID?",
+
+                name: "managerId"
+            }
+        ]).then(answers => {
+            let role_id = JSON.parse(roles.indexOf(answers.role)) + 1
+            console.log(role_id);
+            connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answers.title, answers.salary, role_id, answers.managerId],
+                (err, data) => {
+                    if (err) {
+                        return res.status(500).end();
+                    }
+
+                    init();
+                });
+        })
 };
